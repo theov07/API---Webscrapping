@@ -115,7 +115,7 @@ The evaluation criteria will be as follows:
 
 ### Objective
 
-Before starting the exercise, fork the following git repo if not already done in TP1: https://github.com/klemmm922/EPF-API-TP/ \
+Before starting the exercise, fork the following git repo if not already done in TP1: https://github.com/klem-data/API---Webscrapping \
 Don't forget to add me to the repo with the following email address: clement.letizia1@epfedu.fr
 
 About the API workflow:
