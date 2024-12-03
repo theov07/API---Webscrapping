@@ -1,0 +1,9 @@
+{
+    "model": "LogisticRegression",
+    "parameters": {
+        "penalty": "l2",
+        "solver": "liblinear",
+        "max_iter": 100,
+        "random_state": 42
+    }
+}
