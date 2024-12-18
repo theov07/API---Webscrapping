@@ -1,4 +1,6 @@
 {
+    "train_data": "src/data/train.csv",
+    "y_train_data": "src/data/y_train.csv",
     "model": "LogisticRegression",
     "parameters": {
         "penalty": "l2",
