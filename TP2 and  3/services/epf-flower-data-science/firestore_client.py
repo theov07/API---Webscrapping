@@ -6,7 +6,6 @@ from google.oauth2 import service_account
 credentials_path="TP2 and  3/services/epf-flower-data-science/epf-flower-credentials.json"
 
 
-
 class FirestoreClient:
     """Wrapper around a database"""
 
@@ -35,3 +34,22 @@ class FirestoreClient:
         raise FileExistsError(
             f"No document found at {collection_name} with the id {document_id}"
         )
+    
+
+    def add(self, collection_name: str, document_id: str, parameters: dict) -> None:
+        """Add a new document.
+        Args:
+            collection_name: The collection name
+            document_id: The document id
+            parameters: The parameters to add
+        """
+        self.client.collection(collection_name).document(document_id).set(parameters)
+
+    def update(self, collection_name: str, document_id: str, parameters: dict) -> None:
+        """Update an existing document.
+        Args:
+            collection_name: The collection name
+            document_id: The document id
+            parameters: The parameters to update
+        """
+        self.client.collection(collection_name).document(document_id).update(parameters)
