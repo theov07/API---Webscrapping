@@ -1,6 +1,5 @@
 {
-    "model": "LogisticRegression",
-    "parameters": {
+    "LogisticRegression": {
         "penalty": "l2",
         "solver": "liblinear",
         "max_iter": 100,
