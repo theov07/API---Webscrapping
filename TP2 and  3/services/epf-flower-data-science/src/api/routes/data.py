@@ -10,8 +10,12 @@ import json
 import joblib
 import os
 from typing import List
+from firestore_client import FirestoreClient  # Updated import statement
 
+
+firestore_client = FirestoreClient()
 router = APIRouter()
+
 
 processed_data = None
 X_train = None
@@ -23,7 +27,7 @@ y_test = None
 
 def load_model_parameters():
     with open("src/config/model_parameters.json", "r") as f:
-        return json.load(f)["parameters"]
+        return json.load(f)["LogisticRegression"]
 
 
 def load_iris_data():
@@ -138,22 +142,10 @@ def predict(data: List[dict]):
 
 
 
-
-# from flask import Flask, jsonify
-# from firestore import FirestoreClient 
-
-# app = Flask(__name__)
-
-# # Initialiser le client Firestore
-# firestore_client = FirestoreClient()
-
-# @app.route("/parameters", methods=["GET"])
-# def get_parameters():
-#     try:
-#         # Récupérer les paramètres depuis Firestore
-#         parameters = firestore_client.get("parameters", "parameters")
-#         return jsonify(parameters), 200
-#     except FileExistsError as e:
-#         return jsonify({"error": str(e)}), 404
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+@router.get("/parameters/{collection_name}/{document_id}")
+async def get_parameters(collection_name: str, document_id: str):
+    try:
+        parameters = firestore_client.get(collection_name, document_id)
+        return parameters
+    except FileExistsError as e:
+        raise HTTPException(status_code=404, detail=str(e))

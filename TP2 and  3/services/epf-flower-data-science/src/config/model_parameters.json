@@ -1,8 +1,5 @@
 {
-    "train_data": "src/data/train.csv",
-    "y_train_data": "src/data/y_train.csv",
-    "model": "LogisticRegression",
-    "parameters": {
+    "LogisticRegression": {
         "penalty": "l2",
         "solver": "liblinear",
         "max_iter": 100,

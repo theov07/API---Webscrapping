@@ -1,5 +1,10 @@
 import google.auth
 from google.cloud import firestore
+from google.oauth2 import service_account
+
+
+credentials_path="TP2 and  3/services/epf-flower-data-science/epf-flower-credentials.json"
+
 
 
 class FirestoreClient:
@@ -7,10 +12,12 @@ class FirestoreClient:
 
     client: firestore.Client
 
-    def __init__(self) -> None:
+    def __init__(self, credentials_path: str = credentials_path) -> None:
         """Init the client."""
-        credentials, _ = google.auth.default()
-
+        if credentials_path:
+            credentials = service_account.Credentials.from_service_account_file(credentials_path)
+        else:
+            credentials, _ = google.auth.default()
         self.client = firestore.Client(credentials=credentials)
 
     def get(self, collection_name: str, document_id: str) -> dict:
