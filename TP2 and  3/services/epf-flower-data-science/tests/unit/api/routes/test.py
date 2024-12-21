@@ -2,10 +2,15 @@ import pytest
 from fastapi.testclient import TestClient
 from src.app import get_application
 
+
 app = get_application()
 client = TestClient(app)
 
 
+path_parameters = "/parameters/parameters2/parameters2_document"
+
+
+# Test cases
 
 def test_load_data():
     response = client.get("/load_data")
@@ -66,7 +71,7 @@ def test_predict():
 
 
 def test_get_parameters():
-    response = client.get("/parameters/parameters2/parameters2_document")
+    response = client.get(path_parameters)
     assert response.status_code in [200, 404]
 
 
@@ -75,7 +80,7 @@ def test_add_parameters():
     parameters = {"Random_forest": "gain", 
                 "n_estimators": 100}
     
-    response = client.post("/parameters/parameters2/parameters2_document", json=parameters)
+    response = client.post(path_parameters, json=parameters)
     
     assert response.status_code == 200
     data = response.json()
@@ -87,7 +92,7 @@ def test_update_parameters():
     parameters = {"Random_forest": "gain", 
              "n_estimators": 200}
     
-    response = client.put("/parameters/parameters2/parameters2_document", json=parameters)
+    response = client.put(path_parameters, json=parameters)
     
     assert response.status_code == 200
     

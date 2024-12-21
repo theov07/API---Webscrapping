@@ -1,8 +1,8 @@
-from firestore import FirestoreClient
-
+from firestore_client import FirestoreClient
 
 
 firestore_client = FirestoreClient()
+
 
 collection_name = "parameters"
 document_id = "parameters"

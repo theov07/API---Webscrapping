@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.schemas.message import MessageResponse
 
+
 router = APIRouter()
 
 

@@ -2,6 +2,7 @@ import json
 import pandas as pd
 from pathlib import Path
 
+
 def load_model_parameters():
     with open("src/config/model_parameters.json", "r") as f:
         return json.load(f)["LogisticRegression"]
