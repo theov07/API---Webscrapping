@@ -1,7 +1,11 @@
+# Ignore credentials file
 TP2 and  3/services/epf-flower-data-science/epf-flower-credentials.json
-*.pyc
-services/epf-flower-data-science/__pycache__
 
-services/epf-flower-data-science/src/__pycache__
-services/epf-flower-data-science/src/api/__pycache__
+# Ignore Python bytecode files
+*.pyc
+
+# Ignore all __pycache__ directories
+__pycache__/
+
+# Ignore specific directories
 services/epf-flower-data-science/src/schemas
