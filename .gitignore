@@ -9,3 +9,6 @@ __pycache__/
 
 # Ignore specific directories
 services/epf-flower-data-science/src/schemas
+
+# Ignore specific files
+TP2 and  3/services/epf-flower-data-science/__pycache__/main.cpython-39.pyc
