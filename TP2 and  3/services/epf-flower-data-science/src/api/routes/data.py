@@ -11,6 +11,17 @@ import joblib
 import os
 from typing import List
 from firestore_client import FirestoreClient  # Updated import statement
+from pathlib import Path
+import sys
+
+# services_path = Path(__file__).parent.parent / "services"
+# sys.path.append(str(services_path))
+
+
+from src.services.data import load_iris_data, load_model_parameters
+from src.services.cleaning import preprocess_data
+from src.services.modele import split_data, train_model, evaluate_model
+
 
 
 firestore_client = FirestoreClient()
@@ -25,31 +36,14 @@ y_test = None
 
 
 
-def load_model_parameters():
-    with open("src/config/model_parameters.json", "r") as f:
-        return json.load(f)["LogisticRegression"]
-
-
-def load_iris_data():
-    df = pd.read_csv("src/api/routes/data/Iris.csv")
-    return df
-
-
-def preprocess_data(df):
-    
-    df = df.drop(columns=["Id"])
-    df["Species"] = df["Species"].str.replace("Iris-", "", regex=False)
-    
-    encoder = LabelEncoder()
-    df["Species_encoded"] = encoder.fit_transform(df["Species"])
-    return df
-    
 
 
 @router.get("/load_data")
 def load_data():
     df = load_iris_data()
     return df.to_dict(orient="records")
+
+
 
 
 @router.get("/process_data")
@@ -59,16 +53,12 @@ def process_data():
     return {"message": "Données traitées", "processed_data": df.to_dict(orient="records")}
 
 
+
+
 @router.get("/train_test_split")
-def split_data():
-   
+def split_data_route():
     df = preprocess_data(load_iris_data())
-    
-    X = df.drop(columns=["Species", "Species_encoded"])
-    y = df["Species_encoded"]
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+    X_train, X_test, y_train, y_test = split_data(df)
     return {
         "message": "Division effectuée",
         "X_train": X_train.values.tolist(),
@@ -81,63 +71,37 @@ def split_data():
 
 
 @router.post("/train_model")
-def train_model():
-    try:
-        # Charger les données et les traiter
-        df = preprocess_data(load_iris_data())
-        X = df.drop(columns=["Species", "Species_encoded"])
-        y = df["Species_encoded"]
-        
-        # Diviser les données en ensembles d'entraînement et de test
-        X_train, _, y_train, _ = train_test_split(X, y, test_size=0.2, random_state=42)
+def train_model_route():
+    df = preprocess_data(load_iris_data())
+    X_train, X_test, y_train, y_test = split_data(df)
+    model = train_model(X_train, y_train)
+    accuracy = evaluate_model(model, X_test, y_test)
+    return {"message": "Modèle entraîné", "accuracy": accuracy}
 
-        # Charger les paramètres depuis model_parameters.json
-        params = load_model_parameters()
 
-        # Entraîner le modèle
-        model = LogisticRegression(
-            penalty=params["penalty"],
-            solver=params["solver"],
-            max_iter=params["max_iter"],
-            random_state=params["random_state"]
-        )
-        model.fit(X_train, y_train)
 
-        # Sauvegarder le modèle
-        model_path = "src/models/logistic_regression_model.pkl"
-        os.makedirs(os.path.dirname(model_path), exist_ok=True)  # Crée le dossier si nécessaire
-        joblib.dump(model, model_path)
-
-        return {"message": f"Modèle entraîné et sauvegardé à {model_path}"}
-    except Exception as e:
-        print(f"Erreur rencontrée lors de l'entraînement du modèle : {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 
 @router.post("/predict")
 def predict(data: List[dict]):
-   
     try:
         model_path = "src/models/logistic_regression_model.pkl"
         if not os.path.exists(model_path):
             return {"error": "Le modèle entraîné est introuvable. Veuillez entraîner le modèle d'abord."}
         
         model = joblib.load(model_path)
-
         X_input = pd.DataFrame(data)
-
         predictions = model.predict(X_input)
-
         reverse_species_mapping = {0: "Iris-setosa", 1: "Iris-versicolor", 2: "Iris-virginica"}
         formatted_predictions = [
             f"{pred} ({reverse_species_mapping[pred]})" for pred in predictions
         ]
-        
         return {"predictions": formatted_predictions}
-    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
 
 
 
@@ -154,6 +118,8 @@ async def get_parameters(collection_name: str, document_id: str):
 
 
 
+
+
 @router.post("/parameters/{collection_name}/{document_id}")
 async def add_parameters(collection_name: str, document_id: str, parameters: dict):
     try:
@@ -162,6 +128,7 @@ async def add_parameters(collection_name: str, document_id: str, parameters: dic
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
 
 
 
